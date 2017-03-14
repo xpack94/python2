@@ -1,9 +1,10 @@
 
 
 class Case:
-    def __init__(self,number=0,etat="00",dernierCoup=0):
+    def __init__(self,number=0,etat="00",nom="",dernierCoup=0):
         self._number=number
         self._etat=etat
+        self._nom=nom
         self._signe=self.decoder(self._etat,dernierCoup)
 
 
