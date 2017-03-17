@@ -14,7 +14,6 @@ class tic_tac_toe:
         self._dIntervale=dIntervale
         self._fIntervale=fIntervale
         self._val=[]
-        self._pos=[]
 
 
 
@@ -140,14 +139,13 @@ class tic_tac_toe:
               if t._grid[i][j]._etat=="00":
 
                 val=self.valeur_coup(t,t._grid[i][j]._number,tour)
-               # print("value {} , number {} ".format(val,t._grid[i][j]._number))
+
                 if val>=valMax:
                     valMax=val
                     posMax=t._grid[i][j]._number
 
-                if n == 1:
-                    self._val.append(val)
-                    self._pos.append(posMax)
+                    if n == 1:
+                      self._val.append(val)
                     if val==1:
                         self.affecter(t, t._grid[i][j]._number, tour)
                         if self.victoire(t)==tour:
@@ -195,6 +193,7 @@ class tic_tac_toe:
     # retourne la valeur de la configuration obtenue en jouant à la case pos
     def valeur_coup(self,t,pos,tour):
 
+
         self.affecter(t,pos,tour)
 
         if self.victoire(t) == "01" or self.victoire(t) == "10":
@@ -204,9 +203,10 @@ class tic_tac_toe:
         else:
             c_tour=self.changer_tour(tour)
             val=-self.valeur_coup(t,self.meilleur_coup(t,c_tour,0),c_tour)
-            tour = self.changer_tour(tour)
+            c_tour = self.changer_tour(tour)
 
         self.affecter(t,pos,"00")
+
 
 
         return val
@@ -277,13 +277,17 @@ class tic_tac_toe:
 
 
 
+
+
 def main():
 
-    t=tic_tac_toe(0,8,"010000101001000001","","t1")
+    t=tic_tac_toe(0,8,"011000000100000000","","t1")
     t.print()
 
     print(t.meilleur_coup(t,"01",1))
-    print(t.bloc(t,"01"))
+    #print(t.block(t,"01"))
+
+
 
 
 

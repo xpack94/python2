@@ -55,14 +55,25 @@ class theGame:
             for i in range(3):
                 for j in range(3):
                     if jeu[i][j]._nom==case_a_jouer:
-                        coups_possible=self.trouver_coups_possibles(jeu[i][j]._grid)
-                        #genérer un randome entre 0 et la taille du tableau coups_possible
+
+
                         #la variable coup est affectée le numero du coup a jouer
-                        coup=coups_possible[random.randint(0,len(coups_possible)-1)]
-                        self.jouer(jeu[i][j],coup,tour,case_a_jouer)
+                        #la methode meilleur_coup est appelé pour retourner le numero du meilleur coup
+                        coup=jeu[i][j].meilleur_coup(jeu[i][j],tour,1)
+
+                        #tester si le tic_tac_toe ou on vas jouer n'est pas completé ou gagné deja par un des joueurs
+                        if jeu[i][j].victoire(jeu[i][j])=="11":
+                            self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
+                        #sinon le joueur pourra jouer n'importe ou dans le jeu principal
+                        else:
+                            break
+
+
+
 
 
     #methode qui traverse la grille du jeu principale et renvoi le nom de la case du dernier coup joué
+
     def chercher_nom_de_la_cas_du_dernierCoup(self,dernierCoup,jeu):
         for i in range(3):
             for j in range(3):
@@ -82,6 +93,7 @@ class theGame:
                 if grid[i][j]._number ==dernierCoup:
                     #retourner le nom de la case du dernier coup et retourner l'etat du dernier coup
                     #pour savoir a quel tour c'est
+                    grid[i][j]=Case(grid[i][j]._number,grid[i][j]._etat,grid[i][j]._nom,"")
                     return grid[i][j]._nom , grid[i][j]._etat
 
 
@@ -90,12 +102,12 @@ class theGame:
 
 
     #methode qui cherche tout les coups possible a jouer et les mets dans un tableau
-    def trouver_coups_possibles(self,jeu):
-        coups_possible=[]
-        for i in range(3):
-            for j in range(3):
-                if jeu[i][j]._etat=="00":
-                    coups_possible.append(jeu[i][j]._number)
+    # def trouver_coups_possibles(self,jeu):
+    #     coups_possible=[]
+    #     for i in range(3):
+    #         for j in range(3):
+    #             if jeu[i][j]._etat=="00":
+    #                 coups_possible.append(jeu[i][j]._number)
 
 
 
@@ -103,15 +115,16 @@ class theGame:
 
 
     def jouer(self,jeu,coup,tour,nom):
-        if tour=="01":
-            tour="10"
-        else:
-            tour="01"
+
         for i in range(3):
             for j in range(3):
                 if jeu._grid[i][j]._number == coup:
                      c=Case(coup,tour,nom,coup)
                      jeu._grid[i][j]=c
+                     jeu._grid[i][j]._number
+
+
+
 
 
 
