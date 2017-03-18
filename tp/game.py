@@ -63,13 +63,15 @@ class theGame:
 
                         #tester si le tic_tac_toe ou on vas jouer n'est pas completé ou gagné deja par un des joueurs
                         if jeu[i][j].victoire(jeu[i][j])=="11":
-                            self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
+                            dernier=self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
                         #sinon le joueur pourra jouer n'importe ou dans le jeu principal
                         else:
-                            break
+
+                            dernier=self.jouer_nimporte_ou(case_a_jouer,jeu[i][j].changer_tour(tour))
 
 
 
+        return dernier
 
 
     #methode qui traverse la grille du jeu principale et renvoi le nom de la case du dernier coup joué
@@ -101,13 +103,6 @@ class theGame:
         return ""
 
 
-    #methode qui cherche tout les coups possible a jouer et les mets dans un tableau
-    # def trouver_coups_possibles(self,jeu):
-    #     coups_possible=[]
-    #     for i in range(3):
-    #         for j in range(3):
-    #             if jeu[i][j]._etat=="00":
-    #                 coups_possible.append(jeu[i][j]._number)
 
 
 
@@ -121,10 +116,68 @@ class theGame:
                 if jeu._grid[i][j]._number == coup:
                      c=Case(coup,tour,nom,coup)
                      jeu._grid[i][j]=c
-                     jeu._grid[i][j]._number
+                     return jeu._grid[i][j]._number
 
 
 
+
+
+    def jouer_nimporte_ou(self,case,tour):
+
+        valMax =-2
+        pos =None
+        nom=""
+        jeu=None
+        for i in range(3):
+            for j in range(3):
+                if self._jeu[i][j]._nom!=case:
+                    #verifier  qu'on peut jouer dans ce tictactoe
+                    if self._jeu[i][j].victoire(self._jeu[i][j])=="11":
+                        meilleur=self._jeu[i][j].meilleur_coup(self._jeu[i][j],tour,1)
+                        dernier=self.jouer(self._jeu[i][j],meilleur,tour,self._jeu[i][j]._nom)
+                        #on joue le coup et verifier s'il le joueur gagne
+                        if self._jeu[i][j].victoire(self._jeu[i][j])==tour:
+                            #si le coup joueé permet de gagner dans ce tic tac toe
+                            val = +1
+                        elif self._jeu[i][j].victoire(self._jeu[i][j])=="00":
+                            #si le coup joué permet de faire un match null dans ce tic tac toe
+                            val=0
+                        else:
+                            #si le coup joué ne fait rien
+                            val=-1
+                        #appeler la methode affecter pour déjouer le coup qu'on vient de jouer
+
+                        self.dejouer(self._jeu[i][j], meilleur, "00")
+
+                        if val>valMax:
+                            valMax=val
+                            pos=meilleur
+                            nom=self._jeu[i][j]._nom
+                            jeu=self._jeu[i][j]
+
+
+        return self.jouer(jeu,pos,tour,nom)
+
+
+
+    def dejouer(self,grid,pos,etat):
+        for i in range(3):
+            for j in range(3):
+                if grid._grid[i][j]._number==pos:
+                    c=Case(grid._grid[i][j]._number,etat,grid._grid[i][j]._nom,"")
+                    grid._grid[i][j]=c
+
+
+
+
+    def coder(self,configuration):
+        codage=""
+        dernier =bin(self.jouerCoup(self._jeu,configuration,self._dernierCoup))[2:]
+        for i in range(3):
+            for j in range(3):
+                codage+=self._jeu[i][j].encoder(self._jeu[i][j],codage)
+
+        return str(dernier)+str(codage)
 
 
 
@@ -168,10 +221,13 @@ class theGame:
 
 
 def main():
-    t=theGame("459329034283597291728327479273734123420780266358036")
-    #t.display()
-    t.jouerCoup(t._jeu,"459329034283597291728327479273734123420780266358036",t._dernierCoup)
+    t=theGame("441791014635626456709883261281138727184909075842324")
     t.display()
+    #t.display()
+    #t.jouerCoup(t._jeu,"441791014635626456709883261281138727184909075842324",t._dernierCoup)
+    print(t.coder("441791014635626456709883261281138727184909075842324"))
+    t.display()
+
 
 
 
