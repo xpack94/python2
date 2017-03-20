@@ -7,16 +7,25 @@ class theGame:
     def __init__(self,configuration=""):
 
         self._jeu=[[""] * 3  for i in range(3)]
-        self._con = bin(int(configuration))[2:]
-        self._dernierCoup = self._con[0:7]
-        self._jeu= self.initialiser(self._jeu, self._con,int(self._dernierCoup,2))
+        self._con=str(bin(int(configuration))[2:])
+        self._dernierCoup,self._jeu= self.initialiser(self._jeu, self._con)
+        self._tab=[]
+        self._tabCinfig=[]
+
 
 
     # cette methode initialise le la grille du UTTT
     #t= top et correspond a la 1er ligne de la grille du jeu
     #m=middle et correpond a la 2eme ligne de la grille du jeu
     #b=bottom et correspond a la 3eme ligne de la grille du jeu
-    def initialiser(self,jeu, config,dernierCoup):
+    def initialiser(self,jeu, config):
+
+        if len(config)<169:
+
+            config=self.ajouter_des_zeros(config)
+
+
+        dernierCoup=config[0:7]
         c = config[7:]
         low_index=0
         high_index=18
@@ -32,7 +41,7 @@ class theGame:
                 else:
                     nom="b"+str(j+1)
 
-                t = tic_tac_toe(debut, fin, c[low_index:high_index], dernierCoup,nom)
+                t = tic_tac_toe(debut, fin, c[low_index:high_index], int(dernierCoup,2),nom)
                 jeu[i][j]=t
                 debut=fin+1
                 fin+=9
@@ -41,13 +50,19 @@ class theGame:
 
 
 
+        return dernierCoup,jeu
 
-        return jeu
+    #cette methode ajoute des zeros a la configuration pour faire 196 bits
+    def ajouter_des_zeros(self,config):
+
+        for i in range(len(config),169):
+            config="0"+str(config)
 
 
+        return config
 
-
-    def jouerCoup(self,jeu,configuration,dernierCoup):
+    def jouerCoup(self,jeu,configuration,dernierCoup,param):
+        dernier=""
         dCoup=int(dernierCoup,2)
         #le caractere qui represente le dernier coup joué est placé dans la variable tour
         case_a_jouer,tour=self.chercher_nom_de_la_cas_du_dernierCoup(dCoup,jeu)
@@ -59,11 +74,17 @@ class theGame:
 
                         #la variable coup est affectée le numero du coup a jouer
                         #la methode meilleur_coup est appelé pour retourner le numero du meilleur coup
-                        coup=jeu[i][j].meilleur_coup(jeu[i][j],tour,1)
+
+                        if param!="a":
+                            coup=jeu[i][j].meilleur_coup(jeu[i][j],tour,1)
 
                         #tester si le tic_tac_toe ou on vas jouer n'est pas completé ou gagné deja par un des joueurs
                         if jeu[i][j].victoire(jeu[i][j])=="11":
-                            dernier=self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
+                            if param=="a":
+                                self.trouver_tout_les_coups(jeu[i][j],jeu[i][j].changer_tour(tour))
+                                return tour
+                            else:
+                                dernier=self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
                         #sinon le joueur pourra jouer n'importe ou dans le jeu principal
                         else:
 
@@ -80,6 +101,7 @@ class theGame:
         for i in range(3):
             for j in range(3):
                 if jeu[i][j]._dIntervale<= dernierCoup <=jeu[i][j]._fIntervale :
+
                     return self.trouver_nom_de_la_case(jeu[i][j]._grid,dernierCoup)
 
 
@@ -170,14 +192,67 @@ class theGame:
 
 
 
-    def coder(self,configuration):
+    def coder(self,configuration,dernier):
+
         codage=""
-        dernier =bin(self.jouerCoup(self._jeu,configuration,self._dernierCoup))[2:]
+
+        #dernier =bin(self.jouerCoup(self._jeu,configuration,self._dernierCoup,param))[2:]
+
         for i in range(3):
             for j in range(3):
-                codage+=self._jeu[i][j].encoder(self._jeu[i][j],codage)
+                codage=self._jeu[i][j].encoder(self._jeu[i][j],codage)
 
-        return str(dernier)+str(codage)
+
+        return int(str(dernier)+str(codage),2)
+
+
+    def trouver_tout_les_coups(self,jeu,tour):
+
+        for i in range(3):
+            for j in range(3):
+                if jeu._grid[i][j]._etat=="00":
+                  self._tab.append(jeu._grid[i][j]._number)
+                  self._tab.append(jeu._grid[i][j]._nom)
+
+
+
+
+
+
+    #metode qui retourne le tic_tac_toe qui contient la case donnée en parametres
+    def chercher_jeu(self,jeu,numero):
+
+
+        for i in range(3):
+            for j in range(3):
+                if jeu[i][j]._dIntervale <= int(numero) <=jeu[i][j]._fIntervale:
+
+                    return jeu[i][j]
+
+        return ""
+
+
+
+
+    def codage_arbre(self,configuration,jeu,tour):
+
+        if tour=="01":
+            c_tour ="10"
+        else :
+            c_tour="01"
+
+
+        for i in range(0,len(self._tab),2):
+            tic=self.chercher_jeu(jeu,self._tab[i])
+            dernier= bin(self.jouer(tic, self._tab[i], c_tour,self._tab[i+1]))[2:]
+            self._tabCinfig.append(self.coder(configuration,dernier))
+            self.dejouer(tic,self._tab[i],"00")
+
+
+
+        print(self._tabCinfig)
+
+
 
 
 
@@ -221,12 +296,28 @@ class theGame:
 
 
 def main():
-    t=theGame("441791014635626456709883261281138727184909075842324")
+    t=theGame("459329034283597291728327479273734123420780266358036")
     t.display()
+
     #t.display()
     #t.jouerCoup(t._jeu,"441791014635626456709883261281138727184909075842324",t._dernierCoup)
-    print(t.coder("441791014635626456709883261281138727184909075842324"))
+    # if parametre ==""
+    # dernier=t.jouerCoup(t._jeu,"459329034283597291728327479273734123420780266358036",t._dernierCoup,"")
+    # print(t.coder("459329034283597291728327479273734123420780266358036",bin(dernier)[2:]))
+
+
+
+
+
+    #if parametre =="a"
+    dernier = t.jouerCoup(t._jeu, "459329034283597291728327479273734123420780266358036", t._dernierCoup, "a")
+    t.codage_arbre("459329034283597291728327479273734123420780266358036",t._jeu ,dernier)
+
+    #print(t.coder("459329034283597291728327479273734123420780266358036","a"))
     t.display()
+
+
+
 
 
 
