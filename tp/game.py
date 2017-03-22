@@ -41,7 +41,7 @@ class theGame:
                 else:
                     nom="b"+str(j+1)
 
-                t = tic_tac_toe(debut, fin, c[low_index:high_index], int(dernierCoup,2),nom)
+                t = tic_tac_toe(debut, fin, c[low_index:high_index], int(dernierCoup,2),nom,j+3*i)
                 jeu[i][j]=t
                 debut=fin+1
                 fin+=9
@@ -81,14 +81,16 @@ class theGame:
                         #tester si le tic_tac_toe ou on vas jouer n'est pas completé ou gagné deja par un des joueurs
                         if jeu[i][j].victoire(jeu[i][j])=="11":
                             if param=="a":
-                                self.trouver_tout_les_coups(jeu[i][j],jeu[i][j].changer_tour(tour))
+                                self.trouver_tout_les_coups_dans_un_tictactoe(jeu[i][j],jeu[i][j].changer_tour(tour))
                                 return tour
                             else:
                                 dernier=self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
                         #sinon le joueur pourra jouer n'importe ou dans le jeu principal
                         else:
-
-                            dernier=self.jouer_nimporte_ou(case_a_jouer,jeu[i][j].changer_tour(tour))
+                            if param=="a":
+                               self.trouver_tous_les_coups_dans_leJeu_principale(jeu,jeu[i][j].changer_tour(tour))
+                            else:
+                                dernier=self.jouer_nimporte_ou(case_a_jouer,jeu[i][j].changer_tour(tour))
 
 
 
@@ -206,7 +208,19 @@ class theGame:
         return int(str(dernier)+str(codage),2)
 
 
-    def trouver_tout_les_coups(self,jeu,tour):
+
+    #la methode qui permet de trouver tous les coups possible dans la grille principale
+    #cette methode est appelée quand le joueur est envoyé jouer dans une case qui est deja gagné
+    #donc ce dernier peut jouer dans n'importe quelle case
+    def trouver_tous_les_coups_dans_leJeu_principale(self,jeu,tour):
+        for i in range(3):
+            for j in range(3):
+                if jeu[i][j].victoire(jeu[i][j])=="11":
+                    self.trouver_tout_les_coups_dans_un_tictactoe(jeu[i][j],tour)
+
+    #methode qui permet de trouevr tous les coups possible dan un seul jeu de tic tac toe
+    #met tous les coups possible dans le tableau self._tab
+    def trouver_tout_les_coups_dans_un_tictactoe(self,jeu,tour):
 
         for i in range(3):
             for j in range(3):
@@ -222,7 +236,6 @@ class theGame:
     #metode qui retourne le tic_tac_toe qui contient la case donnée en parametres
     def chercher_jeu(self,jeu,numero):
 
-
         for i in range(3):
             for j in range(3):
                 if jeu[i][j]._dIntervale <= int(numero) <=jeu[i][j]._fIntervale:
@@ -231,16 +244,45 @@ class theGame:
 
         return ""
 
+    #la methode qui permet d'afficher l'arbre avec une profondeur donnée
+    def affichage_arbre(self,t,configuration,param,profondeur):
 
+        co=0
+        count=0
+        dernier = t.jouerCoup(t._jeu, configuration, t._dernierCoup, param)
+        t.codage_arbre(configuration, t._jeu, dernier)
+        counter=int(len(self._tab)/2)
+
+        for i in range(1,profondeur):
+
+            for j in range(co,counter):
+                        t._tab = []
+                        f=theGame(t._tabCinfig[j])
+                        dernier = f.jouerCoup(f._jeu, t._tabCinfig[j] ,f._dernierCoup, param)
+                        count+=int(len(f._tab)/2)
+
+                        f.codage_arbre(t._tabCinfig[j], f._jeu, dernier)
+                        self.merge(t, f)
+
+
+            co=counter
+            counter+=count
+
+        t._tab=[]
+        self.print_arbre(t,configuration)
+
+
+
+
+
+    def merge(self,t,f):
+        for i in f._tabCinfig:
+            t._tabCinfig.append(i)
 
 
     def codage_arbre(self,configuration,jeu,tour):
 
-        if tour=="01":
-            c_tour ="10"
-        else :
-            c_tour="01"
-
+        c_tour= self.change_joueur(tour)
 
         for i in range(0,len(self._tab),2):
             tic=self.chercher_jeu(jeu,self._tab[i])
@@ -250,10 +292,17 @@ class theGame:
 
 
 
-        print(self._tabCinfig)
 
 
 
+
+    def print_arbre(self,game,configuration):
+        print(configuration,end="  ")
+        for i in range(len(game._tabCinfig)):
+            print(game._tabCinfig[i],end="  ")
+        print()
+        print(len(game._tabCinfig))
+        game._tabCinfig=[]
 
 
     #la methode display permet d'afficher la grille du  jeu au complet
@@ -287,11 +336,57 @@ class theGame:
 
 
 
+    def change_joueur(self,tour):
+        if tour == "01":
+            return "10"
+        else:
+            return "01"
+
+    # cette methode renvoi le joueur qui a gagné
+    #si c'est x ça retourne 01 , si s'est o ça retourn 10 , si match nul ça retourne 00
+    # si partie inachevé ça retourne 11
+    def victoire(self, grille):
+
+        alignments= grille[0][0].trouver_alignement(grille[0][0])
+
+        for i in alignments:
+            pas=i["pas"]
+            departs=i["depart"]
+            for j in range(len(departs)):
+
+                pos=departs[j]
+                if self.sym(grille,pos)!="11" or self.sym(grille,pos)!="00":
+                    for k in range(3):
+                        if self.sym(grille,pos)!=self.sym(grille,pos+k*pas):
+                            break
+                        if k==2:
+                            return self.sym(grille,pos)
 
 
+        if self.occupee(grille)==9:
+            return "00"
 
 
+        return "11"
 
+    #la methode sym permet de retourner le joueur qui a gagné dans un tic tac toe donné
+    def sym(self,grille,pos):
+        for i in range(3):
+            for j in range(3):
+                if grille[i][j]._numberofTicTacToe==pos:
+                    return grille[i][j].victoire(grille[i][j])
+
+
+    #compte si toute les case on etait gagnée par un joueur soit x ou o
+    def occupee(self,grille):
+        co=0
+        for i in range(3):
+            for j in range(3):
+                if  grille[i][j].victoire(grille[i][j])!="11":
+                    co+=1
+
+
+        return co
 
 
 
@@ -310,11 +405,18 @@ def main():
 
 
     #if parametre =="a"
-    dernier = t.jouerCoup(t._jeu, "459329034283597291728327479273734123420780266358036", t._dernierCoup, "a")
-    t.codage_arbre("459329034283597291728327479273734123420780266358036",t._jeu ,dernier)
+    t.affichage_arbre(t,"459329034283597291728327479273734123420780266358036","a",3)
+    #dernier = t.jouerCoup(t._jeu, "459329034283597291728327479273734123420780266358036", t._dernierCoup, "a")
+    # t.codage_arbre("459329034283597291728327479273734123420780266358036",t._jeu ,dernier)
 
     #print(t.coder("459329034283597291728327479273734123420780266358036","a"))
-    t.display()
+
+
+    j=theGame("412560981889008398670328118285239794137896400028948")
+
+    j.display()
+
+
 
 
 

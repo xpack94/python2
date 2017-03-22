@@ -6,20 +6,18 @@ class tic_tac_toe:
     #car chaque tic_tac_toe a son propre intervale de nombre
     #exemple le 1er entre [0-8] 2 eme entre [9-17] etc...
 
-    def __init__(self,dIntervale=0,fIntervale=0,etat="",dernierCoup=0,nom=""):
+    def __init__(self,dIntervale=0,fIntervale=0,etat="",dernierCoup=0,nom="",number=0):
         c=Case(dIntervale,"00")
         self._grid=[[c] * 3 for i in range(3)]
         self._nom=nom
         self._grid= self.initialiser(self._grid,dIntervale,etat,dernierCoup)
         self._dIntervale=dIntervale
         self._fIntervale=fIntervale
+        self._numberofTicTacToe=number
         self._val=[]
 
 
 
-    #class has method victory
-    #method turn
-    #method afficher
 
     def initialiser(self,grid,number,etat,dernierCoup):
 
@@ -274,6 +272,20 @@ class tic_tac_toe:
 
 
 
+    def encoder(self,t,codage):
+
+        for i in range(3):
+            for j in range(3):
+                codage+=t._grid[i][j]._etat
+
+
+
+        return  codage
+
+
+
+
+
 
 
 
@@ -281,11 +293,12 @@ class tic_tac_toe:
 
 def main():
 
-    t=tic_tac_toe(0,8,"011000000100000000","","t1")
+    t=tic_tac_toe(0,8,"000000000000000001","","t1")
     t.print()
 
-    print(t.meilleur_coup(t,"01",1))
+    print(t.meilleur_coup(t,"10",1))
     #print(t.block(t,"01"))
+
 
 
 
