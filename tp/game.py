@@ -64,37 +64,67 @@ class theGame:
     def jouerCoup(self,jeu,configuration,dernierCoup,param):
         dernier=""
         dCoup=int(dernierCoup,2)
-        #le caractere qui represente le dernier coup joué est placé dans la variable tour
-        case_a_jouer,tour=self.chercher_nom_de_la_cas_du_dernierCoup(dCoup,jeu)
-        if case_a_jouer!="":
-            for i in range(3):
-                for j in range(3):
-                    if jeu[i][j]._nom==case_a_jouer:
+        #verifier que la configuration de la grille ne correspond pas a une grille vide
+        if configuration!="000000000000000000000000000000000000000000000000000":
+
+            #le caractere qui represente le dernier coup joué est placé dans la variable tour
+            case_a_jouer,tour=self.chercher_nom_de_la_cas_du_dernierCoup(dCoup,jeu)
+            if case_a_jouer!="":
+                for i in range(3):
+                    for j in range(3):
+                        if jeu[i][j]._nom==case_a_jouer:
 
 
-                        #la variable coup est affectée le numero du coup a jouer
-                        #la methode meilleur_coup est appelé pour retourner le numero du meilleur coup
+                            #la variable coup est affectée le numero du coup a jouer
+                            #la methode meilleur_coup est appelé pour retourner le numero du meilleur coup
 
-                        if param!="a":
-                            coup=jeu[i][j].meilleur_coup(jeu[i][j],tour,1)
+                            if param!="a":
+                                coup=jeu[i][j].meilleur_coup(jeu[i][j],tour,1)
 
-                        #tester si le tic_tac_toe ou on vas jouer n'est pas completé ou gagné deja par un des joueurs
-                        if jeu[i][j].victoire(jeu[i][j])=="11":
-                            if param=="a":
-                                self.trouver_tout_les_coups_dans_un_tictactoe(jeu[i][j],jeu[i][j].changer_tour(tour))
-                                return tour
+                            #tester si le tic_tac_toe ou on vas jouer n'est pas completé ou gagné deja par un des joueurs
+                            if jeu[i][j].victoire(jeu[i][j])=="11":
+                                if param=="a":
+                                    self.trouver_tout_les_coups_dans_un_tictactoe(jeu[i][j],jeu[i][j].changer_tour(tour))
+                                    return tour
+                                else:
+                                    dernier=self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
+                            #sinon le joueur pourra jouer n'importe ou dans le jeu principal
                             else:
-                                dernier=self.jouer(jeu[i][j],coup,jeu[i][j].changer_tour(tour),case_a_jouer)
-                        #sinon le joueur pourra jouer n'importe ou dans le jeu principal
-                        else:
-                            if param=="a":
-                               self.trouver_tous_les_coups_dans_leJeu_principale(jeu,jeu[i][j].changer_tour(tour))
-                            else:
-                                dernier=self.jouer_nimporte_ou(case_a_jouer,jeu[i][j].changer_tour(tour))
+                                if param=="a":
+                                   self.trouver_tous_les_coups_dans_leJeu_principale(jeu,jeu[i][j].changer_tour(tour))
+                                else:
+                                    dernier=self.jouer_nimporte_ou(case_a_jouer,jeu[i][j].changer_tour(tour))
 
+        #la configuration de la grille coresspond a une grille vide
+        else:
+            if param=="a":
+
+                self .trouver_tous_les_coups_dans_leJeu_principale(jeu,"01")
+                return "10"
+            else:
+                dernier=self.joueur_dans_une_grille_vide(jeu)
 
 
         return dernier
+
+
+
+    # cette methode est appeler lorsque la grille est vide et lorsque le dernier coup n'existe pas
+    #donc elle joue un coup au hasard n'importe ou dans la grille
+    def joueur_dans_une_grille_vide(self,jeu):
+        dernier=None
+        r= random.randrange(0,9)
+        for i in range(3):
+            for j in range(3):
+                if jeu[i][j]._numberofTicTacToe==r:
+                    f=random.randrange(jeu[i][j]._dIntervale,jeu[i][j]._fIntervale)
+                    for k in range(3):
+                        for l in range(3):
+                            if jeu[i][j]._grid[k][l]._number==f:
+                               dernier= self.jouer(jeu[i][j],f,"01",jeu[i][j]._grid[k][l]._nom)
+
+        return dernier
+
 
 
     #methode qui traverse la grille du jeu principale et renvoi le nom de la case du dernier coup joué
@@ -108,6 +138,7 @@ class theGame:
 
 
         return "" ,"00"
+
 
 
 
@@ -282,6 +313,7 @@ class theGame:
 
     def codage_arbre(self,configuration,jeu,tour):
 
+
         c_tour= self.change_joueur(tour)
 
         for i in range(0,len(self._tab),2):
@@ -391,8 +423,8 @@ class theGame:
 
 
 def main():
-    t=theGame("459329034283597291728327479273734123420780266358036")
-    t.display()
+    # t=theGame("459329034283597291728327479273734123420780266358036")
+    # t.display()
 
     #t.display()
     #t.jouerCoup(t._jeu,"441791014635626456709883261281138727184909075842324",t._dernierCoup)
@@ -405,16 +437,22 @@ def main():
 
 
     #if parametre =="a"
-    t.affichage_arbre(t,"459329034283597291728327479273734123420780266358036","a",3)
+    #t.affichage_arbre(t,"459329034283597291728327479273734123420780266358036","a",5)
     #dernier = t.jouerCoup(t._jeu, "459329034283597291728327479273734123420780266358036", t._dernierCoup, "a")
     # t.codage_arbre("459329034283597291728327479273734123420780266358036",t._jeu ,dernier)
 
     #print(t.coder("459329034283597291728327479273734123420780266358036","a"))
 
 
-    j=theGame("412560981889008398670328118285239794137896400028948")
+    j=theGame("000000000000000000000000000000000000000000000000000")
+    j.affichage_arbre(j, "000000000000000000000000000000000000000000000000000", "a", 2)
 
     j.display()
+
+    k=theGame("461834517396565322152364407138345434211274683580425")
+    k.display()
+
+
 
 
 

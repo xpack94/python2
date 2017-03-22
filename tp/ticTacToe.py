@@ -293,11 +293,13 @@ class tic_tac_toe:
 
 def main():
 
-    t=tic_tac_toe(0,8,"000000000000000001","","t1")
+    t=tic_tac_toe(0,8,"000000000000000000","","t1")
     t.print()
 
-    print(t.meilleur_coup(t,"10",1))
+    print(t.meilleur_coup(t,"01",1))
     #print(t.block(t,"01"))
+
+
 
 
 
