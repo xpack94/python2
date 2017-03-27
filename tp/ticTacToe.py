@@ -1,4 +1,7 @@
+#code fait par Abdesselam NAHNAH et Ines AYARI
+
 from case import Case
+import random
 
 
 class tic_tac_toe:
@@ -132,18 +135,27 @@ class tic_tac_toe:
 
         valMax=-2
         posMax=None
+
+        #tester si la grille est completement vide
+        #si oui generer un randome qui determinera le numero de la case du prochain coup
+        if self.occupees(t._grid)==0 and n==1:
+            return random.randrange(t._dIntervale,t._fIntervale)
+
+
+
         for i in range(3):
             for j in range(3):
               if t._grid[i][j]._etat=="00":
 
                 val=self.valeur_coup(t,t._grid[i][j]._number,tour)
-
+                # val variable val peut etre affecter -1 , 0 , 1
                 if val>=valMax:
                     valMax=val
                     posMax=t._grid[i][j]._number
 
                     if n == 1:
                       self._val.append(val)
+
                     if val==1:
                         self.affecter(t, t._grid[i][j]._number, tour)
                         if self.victoire(t)==tour:
@@ -161,7 +173,8 @@ class tic_tac_toe:
                     c_t="10"
                 else:
                     c_t="01"
-
+                #appele a la methode block qui determine le meilleur coup a joueur
+                #block est appeler que lorsque touts les coups possible ne permettent pas de gagner
                 return self.block(t,c_t)
 
 
@@ -238,7 +251,6 @@ class tic_tac_toe:
     def block(self,t,state):
         alignments = self.trouver_alignement(t)
         val=0
-
         for i in alignments:
             pas = i["pas"]
             departs = i["depart"]
@@ -252,7 +264,10 @@ class tic_tac_toe:
                                 if val==1:
                                     return pos-pas
                             if k==2:
-                                return pos+k*pas
+                                if self.sym(t._grid,pos+k*pas)=="00":
+                                    return pos+k*pas
+                                else:
+                                    break
 
                             else:
                                 break
@@ -271,7 +286,7 @@ class tic_tac_toe:
         return -1
 
 
-
+    #cette methode permet d'encoder un tic_tac_toe donné en parametres en 18 chiffre binaires
     def encoder(self,t,codage):
 
         for i in range(3):
@@ -292,15 +307,11 @@ class tic_tac_toe:
 
 
 def main():
-
-    t=tic_tac_toe(0,8,"000000000000000000","","t1")
-    t.print()
-
-    print(t.meilleur_coup(t,"01",1))
-    #print(t.block(t,"01"))
-
-
-
+     a, b, c = 3, 2, 1
+     while c < 15:
+        print(c, ": ", b)
+        a, b, c = b, a * b, c + 0
+main()
 
 
 

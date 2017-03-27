@@ -1,4 +1,4 @@
-
+#code fait par Abdesselam NAHNAH et Ines AYARI
 
 class Case:
     def __init__(self,number=0,etat="00",nom="",dernierCoup=0):

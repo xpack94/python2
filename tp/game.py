@@ -1,3 +1,8 @@
+#code fait par Abdesselam NAHNAH et Ines AYARI
+
+import sys
+
+
 from case import Case
 from ticTacToe import tic_tac_toe
 import random
@@ -60,7 +65,9 @@ class theGame:
 
 
         return config
-
+    # la methode jouerCoup permet de trouver le tictactoe ou le prochain coup va se joueur
+    #appele la methode meilleur coup de la classe tic_tac_toe qui renvoi le meilleur coup a jouer
+    #le meilleur coup est donné en parametre a la methode jouer pour le jouer
     def jouerCoup(self,jeu,configuration,dernierCoup,param):
         dernier=""
         dCoup=int(dernierCoup,2)
@@ -163,7 +170,7 @@ class theGame:
 
         return coups_possible
 
-
+    #methode qui prend un numero de case et joue un coup a celle ci
     def jouer(self,jeu,coup,tour,nom):
 
         for i in range(3):
@@ -176,7 +183,8 @@ class theGame:
 
 
 
-
+    #cette methode est appelé lorsque le joueur est envoyé jouer dans une case qui est deja gagné
+    #donc ce joueur peut jouer n'importe ou
     def jouer_nimporte_ou(self,case,tour):
 
         valMax =-2
@@ -214,7 +222,7 @@ class theGame:
         return self.jouer(jeu,pos,tour,nom)
 
 
-
+    #dejoue un coup ce trouvant a pos
     def dejouer(self,grid,pos,etat):
         for i in range(3):
             for j in range(3):
@@ -224,7 +232,7 @@ class theGame:
 
 
 
-
+    #
     def coder(self,configuration,dernier):
 
         codage=""
@@ -310,15 +318,20 @@ class theGame:
         for i in f._tabCinfig:
             t._tabCinfig.append(i)
 
-
+    #cete methode permet simuler un coup ensuite generer la nouvelle configuration
+    #obtenue en jouant ce dernier
+    #et puis ensuite dejouer le meme coup
+    #tout les resultat des encodage d'arbre sont mis dans le tableau tabCinfig
     def codage_arbre(self,configuration,jeu,tour):
 
-
+        #changer le tour
         c_tour= self.change_joueur(tour)
 
         for i in range(0,len(self._tab),2):
+            #chercher le tictactoe ou le coup va se jouer
             tic=self.chercher_jeu(jeu,self._tab[i])
             dernier= bin(self.jouer(tic, self._tab[i], c_tour,self._tab[i+1]))[2:]
+            # mettre la nouvelle configuration dans le tableau tabCinfig
             self._tabCinfig.append(self.coder(configuration,dernier))
             self.dejouer(tic,self._tab[i],"00")
 
@@ -327,13 +340,13 @@ class theGame:
 
 
 
-
+    #boucle sur les elements du tableau tabCinfig et afficher son contenue
+    #qui correspond a toute les simulation d'arbre avec un profondeur donnée
     def print_arbre(self,game,configuration):
         print(configuration,end="  ")
         for i in range(len(game._tabCinfig)):
             print(game._tabCinfig[i],end="  ")
         print()
-        print(len(game._tabCinfig))
         game._tabCinfig=[]
 
 
@@ -423,50 +436,115 @@ class theGame:
 
 
 def main():
-    # t=theGame("459329034283597291728327479273734123420780266358036")
-    # t.display()
 
-    #t.display()
-    #t.jouerCoup(t._jeu,"441791014635626456709883261281138727184909075842324",t._dernierCoup)
-    # if parametre ==""
-    # dernier=t.jouerCoup(t._jeu,"459329034283597291728327479273734123420780266358036",t._dernierCoup,"")
-    # print(t.coder("459329034283597291728327479273734123420780266358036",bin(dernier)[2:]))
+        print("mode par defaut =  configuration")
+        print("mode arbre = a profondeur configuration")
+        print("mode affichage = p configuration ")
+        mode=input("entrer le mode que vous disirez: ")
 
 
 
 
-
-    #if parametre =="a"
-    #t.affichage_arbre(t,"459329034283597291728327479273734123420780266358036","a",5)
-    #dernier = t.jouerCoup(t._jeu, "459329034283597291728327479273734123420780266358036", t._dernierCoup, "a")
-    # t.codage_arbre("459329034283597291728327479273734123420780266358036",t._jeu ,dernier)
-
-    #print(t.coder("459329034283597291728327479273734123420780266358036","a"))
+        if mode[0]=="p":
+            for i in range(len(mode)):
+                if mode[i]!="p" and mode[i]!=" ":
+                    configuration=mode[i:]
+                    break
 
 
-    j=theGame("000000000000000000000000000000000000000000000000000")
-    j.affichage_arbre(j, "000000000000000000000000000000000000000000000000000", "a", 2)
+            t=theGame(configuration)
+            t.display()
+        elif mode[0]=="a":
+            configuration=""
+            co=0
+            for i in range(len(mode)):
+                if mode[i]!="a" and mode[i]!=" ":
+                    for j in range(i+1,len(mode)):
+                        if mode[j]!=" ":
+                            co+=1
+                        else:
+                            break
+                    profondeur=mode[i:i+co+1]
+                    index=i+co+1
+                    break
 
-    j.display()
-
-    k=theGame("461834517396565322152364407138345434211274683580425")
-    k.display()
-
-
+            for i in range(index+1,len(mode)):
+                if mode[i]!=" ":
+                    configuration=mode[i:]
+                    break
 
 
+            if len(configuration)!=51:
+                print("la configuration est incorrecte")
+            else:
+                t=theGame(configuration)
 
+                if profondeur=="0" :
 
+                    print(configuration)
+                else:
+                    vic=t.victoire(t._jeu)
+                    if vic!="11":
+                        print("la partie est terminée")
+                        if vic=="01":
+                            print("le vainqeur est X")
+                        else:
+                            print("le vainqeur est O")
 
+                    t.affichage_arbre(t,configuration,"a",int(profondeur))
 
-
-
-
-
+        else:
+             for i in range(len(mode)):
+                 if mode[i]!=" ":
+                     configuration=mode[i:]
+                     break
+             if len(configuration)!=51:
+                 print("la configuration est incorrecte")
+             else:
+                 t=theGame(configuration)
+                 vi= t.victoire(t._jeu)
+                 dernier = bin(t.jouerCoup(t._jeu, configuration, t._dernierCoup, ""))[2:]
+                 if vi=="01":
+                     print("vous ne pouvez plus jouer")
+                     print("la partie est deja terminée ")
+                     print("le vainqeur est X")
+                 elif vi =="10":
+                     print("vous ne pouvez plus jouer ")
+                     print("la partie est deja terminée ")
+                     print("le vainqeur est O")
+                 else:
+                     coup=t.coder(configuration,dernier)
+                     f=theGame(coup)
+                     print(coup)
+                     vic=f.victoire(f._jeu)
+                     if vic=="01":
+                         print("la partie est terminée ")
+                         print("le vainqeur est  X")
+                     else:
+                         print("la partie est terminée")
+                         print("le vainqeur est O")
 
 
 
 
 main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
