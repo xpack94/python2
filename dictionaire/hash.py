@@ -63,16 +63,65 @@ class HashMap:
                 if ("" == line):
                     break;
 
+
+
+
+    #la methode qui permet de lire le mot qui se trouve dans le fichier input
+    def readInput(self):
+        input=open("input.txt")
+        word=input.readline()[0:-1]
+        swapedWord=word
+        return self.swap(word)
+
+
+
+    #la methode qui permet d'Intervertir chaque paire de caractères adjacents du mot
+    #et verifie a chaque fois si le mot generer existe dans le dictionaire
+    def swap(self,word):
+        swapedWord = word
+        t=""
+        for i in range(len(word)):
+            lowerSubWord = word[:i]
+            higherSubWord = word[i + 2:]
+            swapedWord = "".join([word[i:i + 2][::-1]])
+            swapedWord = lowerSubWord + swapedWord + higherSubWord
+            if self.find(swapedWord) != "":
+               t+= " "+self.find(swapedWord)
+
+        return t
+    #la methode qui permet de chercher un mot dans la table et le retourne si il exist
+    def find(self,word):
+        code=self.hashFunction(word)
+        c=self._hashTable[code]
+
+        if c._element==word:
+            return word
+        else:
+            while c._next!=None:
+                c=c._next
+                if c._element==word:
+                    return word
+
+        return ""
+
+
+
     def printTable(self):
         for i in range(len(self._hashTable)):
             print(self.get(i))
 
+
 def main():
 
     h=HashMap(50000)
-
     h.readDictionary()
-    h.printTable()
+    #h.printTable()
+    print(h.readInput())
+
+
+
+
+
 
 
 main()
