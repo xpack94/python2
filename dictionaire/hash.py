@@ -89,6 +89,60 @@ class HashMap:
                t+= " "+self.find(swapedWord)
 
         return t
+
+    #la methode qui permet d'inserer chaque lettre de l'alphabet dans chaque paire de caractaires adjacents
+    def insert(self,word):
+        alphabet=["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u"
+                  ,"v","w","x","y","z"]
+
+        wordsFound=[]
+
+        for i in range(len(word)+1):
+            lowerLetter=word[:i]
+            higherLetter=word[i:]
+            for j in range(len(alphabet)):
+                newWord=lowerLetter+str(alphabet[j])+higherLetter
+                ifFoundMatch=self.find(newWord)
+                if ifFoundMatch!="":
+                    wordsFound.append(ifFoundMatch)
+
+
+        return ifFoundMatch
+
+
+
+    #la methode qui permet de supprimer chaque caractaire du mot
+    def deleteEveryord(self,word):
+        matches_found=[]
+        for i in range(len(word)):
+
+            lowerLetter=word[:i]
+            letter_to_delete=word[i+1:]
+            new_word=lowerLetter+letter_to_delete
+
+            iffoudMatch=self.find(new_word)
+            if iffoudMatch!="":
+                print(iffoudMatch)
+                matches_found.append(iffoudMatch)
+
+
+    # la methode qui permet de remplacer chaque caractaire par chaque lettre de l'alphabet
+    def replaceEveryLetter(self,word):
+        alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                    "u"
+            , "v", "w", "x", "y", "z"]
+
+        matches_found=[]
+        for i in range(len(word)):
+            lowerWord=word[:i]
+            higherWord=word[i+1:]
+            for j in range(len(alphabet)):
+                new_word=lowerWord+alphabet[j]+higherWord
+                ifFoundMatch=self.find(new_word)
+                if ifFoundMatch!="":
+                    matches_found.append(ifFoundMatch)
+
+
     #la methode qui permet de chercher un mot dans la table et le retourne si il exist
     def find(self,word):
         code=self.hashFunction(word)
@@ -116,9 +170,9 @@ def main():
     h=HashMap(50000)
     h.readDictionary()
     #h.printTable()
-    print(h.readInput())
+    #print(h.readInput())
 
-
+    h.replaceEveryLetter("binjour")
 
 
 
