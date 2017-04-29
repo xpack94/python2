@@ -70,10 +70,10 @@ class HashMap:
 
     #la methode qui permet de lire le mot qui se trouve dans le fichier input
     def readInput(self):
-        input=open("input.txt")
-        word=input.readline()[0:-1]
-        swapedWord=word
-        return self.swap(word)
+        with io.open('input.txt', 'r', encoding='utf8') as input:
+            word=input.readline()[0:-1]
+            swapedWord=word
+            return word
 
 
 
@@ -81,16 +81,18 @@ class HashMap:
     #et verifie a chaque fois si le mot generer existe dans le dictionaire
     def swap(self,word):
         swapedWord = word
-        t=""
+        matches_found=[]
         for i in range(len(word)):
             lowerSubWord = word[:i]
             higherSubWord = word[i + 2:]
             swapedWord = "".join([word[i:i + 2][::-1]])
             swapedWord = lowerSubWord + swapedWord + higherSubWord
-            if self.find(swapedWord) != "":
-               t+= " "+self.find(swapedWord)
 
-        return t
+            if self.find(swapedWord) != "":
+                if swapedWord!=word:
+                    matches_found.append(self.find(swapedWord))
+
+        return matches_found
 
     #la methode qui permet d'inserer chaque lettre de l'alphabet dans chaque paire de caractaires adjacents
     def insert(self,word):
@@ -109,7 +111,7 @@ class HashMap:
                     wordsFound.append(ifFoundMatch)
 
 
-        return ifFoundMatch
+        return wordsFound
 
 
 
@@ -127,6 +129,8 @@ class HashMap:
                 print(iffoudMatch)
                 matches_found.append(iffoudMatch)
 
+        return matches_found
+
 
     # la methode qui permet de remplacer chaque caractaire par chaque lettre de l'alphabet
     def replaceEveryLetter(self,word):
@@ -141,8 +145,10 @@ class HashMap:
             for j in range(len(alphabet)):
                 new_word=lowerWord+alphabet[j]+higherWord
                 ifFoundMatch=self.find(new_word)
-                if ifFoundMatch!="":
+                if ifFoundMatch!="" and ifFoundMatch!=word:
                     matches_found.append(ifFoundMatch)
+
+        return matches_found
 
 
     def permut(self,word):
@@ -175,7 +181,82 @@ class HashMap:
 
 
 
+    def correct(self,sentence):
+        word=""
+        sentence_with_suggestions=""
+        suggestions=""
+        corrected_sentence=""
+        counter=0
+        while counter < len(sentence):
+            try:
+                index=sentence.index(" ",counter)
+            except ValueError:
+              break
+            subWord = sentence[counter:index]
+            counter=index+1
+            if subWord!=" ":
+                if self.find(subWord)!=subWord:
+                    matches = self.swap(subWord)
+                    if len(matches)!=0:
+                        if suggestions!="":
+                            suggestions+=","+str(self.alignSuggestions(matches))
+                        else:
+                            suggestions+=self.alignSuggestions(matches)
 
+                    matches = self.insert(subWord)
+                    if len(matches)!=0:
+                        if suggestions!="":
+                            suggestions+=","+str(self.alignSuggestions(matches))
+                        else:
+                            suggestions+=self.alignSuggestions(matches)
+                    print(suggestions)
+                    matches = self.deleteEveryord(subWord)
+                    if len(matches)!=0:
+                        if suggestions!="":
+                            suggestions+=","+str(self.alignSuggestions(matches))
+                        else:
+                            suggestions+=self.alignSuggestions(matches)
+                    print(suggestions)
+                    matches = self.replaceEveryLetter(subWord)
+                    if  len(matches)!=0:
+                        if suggestions!="":
+                            suggestions+=","+str(self.alignSuggestions(matches))
+                        else:
+                            suggestions+=self.alignSuggestions(matches)
+                    print(suggestions)
+                    matches = self.permut(subWord)
+                    if  len(matches)!=0:
+                        if suggestions!="":
+                            suggestions+=","+str(self.alignSuggestions(matches))
+                        else:
+                            suggestions+=self.alignSuggestions(matches)
+
+                    if  suggestions!="":
+                        suggestions="("+str(suggestions)+")"
+                        corrected_sentence+=self.concatSentence(subWord,suggestions)
+                        suggestions=""
+                    else:
+                        corrected_sentence+=subWord
+                else:
+                    corrected_sentence+=subWord
+        return corrected_sentence
+
+
+    def alignSuggestions(self,matches):
+        t=""
+        co=1
+        for i in matches:
+            t+=i
+            if co!=len(matches):
+               t+=","
+            co+=1
+        return t
+
+
+    def concatSentence(self,word,suggestions):
+        t=""
+        t+="["+str(word)+"]"+str(suggestions)
+        return t
 
     def printTable(self):
         for i in range(len(self._hashTable)):
@@ -188,9 +269,7 @@ def main():
     h.readDictionary()
     #h.printTable()
     #print(h.readInput())
-
-    h.permut("salutbonjour")
-
+    print(h.correct(h.readInput()))
 
 main()
 

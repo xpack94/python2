@@ -306,14 +306,6 @@ class tic_tac_toe:
 
 
 
-def main():
-     a, b, c = 3, 2, 1
-     while c < 15:
-        print(c, ": ", b)
-        a, b, c = b, a * b, c + 0
-main()
-
-
 
 
 
