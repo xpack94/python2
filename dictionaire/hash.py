@@ -1,4 +1,5 @@
 from node import Node
+import io
 class HashMap:
     def __init__(self,capacity=50000):
         n=Node(None,None)
@@ -54,14 +55,15 @@ class HashMap:
     #la methode qui permet de lire tous les mots dans le dictionaire dict
     #et les mettre dans la table de hachage
     def readDictionary(self):
-            f1 = open("dict.txt")
-            while True:
-                line = f1.readline()
-                line=line[0:-1]
-                index=self.hashFunction(line)
-                self.set(index,line)
-                if ("" == line):
-                    break;
+            # f1 = open("dict.txt")
+            with io.open('dict.txt', 'r', encoding='utf8') as f1:
+                while True:
+                    line = f1.readline()
+                    line=line[0:-1]
+                    index=self.hashFunction(line)
+                    self.set(index,line)
+                    if ("" == line):
+                        break;
 
 
 
@@ -143,6 +145,19 @@ class HashMap:
                     matches_found.append(ifFoundMatch)
 
 
+    def permut(self,word):
+        matches_found=[]
+        for i in range(len(word)):
+            word1=word[:i+1]
+            word2=word[i+1:]
+            if (self.find(word1)!="" and self.find(word2)!=""):
+                matches_found.append(word1+str(" ")+word2)
+
+        return matches_found
+
+
+
+
     #la methode qui permet de chercher un mot dans la table et le retourne si il exist
     def find(self,word):
         code=self.hashFunction(word)
@@ -160,6 +175,8 @@ class HashMap:
 
 
 
+
+
     def printTable(self):
         for i in range(len(self._hashTable)):
             print(self.get(i))
@@ -172,10 +189,7 @@ def main():
     #h.printTable()
     #print(h.readInput())
 
-    h.replaceEveryLetter("binjour")
-
-
-
+    h.permut("salutbonjour")
 
 
 main()
