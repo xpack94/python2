@@ -108,7 +108,8 @@ class HashMap:
                 newWord=lowerLetter+str(alphabet[j])+higherLetter
                 ifFoundMatch=self.find(newWord)
                 if ifFoundMatch!="":
-                    wordsFound.append(ifFoundMatch)
+                      if (ifFoundMatch in wordsFound) ==False:
+                        wordsFound.append(ifFoundMatch)
 
 
         return wordsFound
@@ -126,7 +127,6 @@ class HashMap:
 
             iffoudMatch=self.find(new_word)
             if iffoudMatch!="":
-                print(iffoudMatch)
                 matches_found.append(iffoudMatch)
 
         return matches_found
@@ -150,7 +150,7 @@ class HashMap:
 
         return matches_found
 
-
+    #la methode qui permet de separer un mot de toutes les n-1 façons possible
     def permut(self,word):
         matches_found=[]
         for i in range(len(word)):
@@ -180,7 +180,7 @@ class HashMap:
         return ""
 
 
-
+    #la mehode qui corrige le mot qui se trouve dans le fichier input
     def correct(self,sentence):
         word=""
         sentence_with_suggestions=""
@@ -191,39 +191,62 @@ class HashMap:
             try:
                 index=sentence.index(" ",counter)
             except ValueError:
-              break
-            subWord = sentence[counter:index]
+                #une erreur est toujours generer quand on est rendu au dernier mot
+                index=len(sentence)
+            subWord =""+sentence[counter:index]
             counter=index+1
+            #verifier que le mot ne contient pas de charactaires speciaux
+            #si oui ignorer ces charactaires
+            if subWord.isalpha()==False:
+                newWord=[]
+                newWord=self.turn_into_alpha(subWord)
+                #verifier si la taille du tableau newWord est egale a 1
+                #sinon on c'est que le mot contenait un apostrophe
+                if len(newWord)==1:
+                    subWord=newWord[0]
+                else:
+                    #puisque le mot contient un apostrophe on on decoupe le mot en deux
+                    #et on verifier pour chaqu'un des mots l'orthographe
+                    sentence = sentence.replace(newWord[0]+"'", "")
+                    counter-=len(newWord[0])+1
+                    subWord=newWord[0]
+                    counter-=len(newWord[1])+1
+
+
             if subWord!=" ":
+                #verifier si le mot existe deja dans le dictionaire
+                #si oui cela veut dire qu'il est bien écrit
                 if self.find(subWord)!=subWord:
+                    #a chaque fois on fait appele aux 5 methodes qui detectent toutes les possibilités de corrections possible
+                    #1 faire appele a la methode qui swap chaque paire de charactaire
                     matches = self.swap(subWord)
                     if len(matches)!=0:
                         if suggestions!="":
                             suggestions+=","+str(self.alignSuggestions(matches))
                         else:
                             suggestions+=self.alignSuggestions(matches)
-
+                    #2 faire appele a la methode qui insert chaque lettre entre chaque paire du mot
                     matches = self.insert(subWord)
                     if len(matches)!=0:
                         if suggestions!="":
                             suggestions+=","+str(self.alignSuggestions(matches))
                         else:
                             suggestions+=self.alignSuggestions(matches)
-                    print(suggestions)
+                    #3 faire appele a la methode qui supprime chaque charactaire du mot
                     matches = self.deleteEveryord(subWord)
                     if len(matches)!=0:
                         if suggestions!="":
                             suggestions+=","+str(self.alignSuggestions(matches))
                         else:
                             suggestions+=self.alignSuggestions(matches)
-                    print(suggestions)
+                    #4 faire appele a la methde qui remplace chaque paire du mot pas chaque lettre de l'alphabet
                     matches = self.replaceEveryLetter(subWord)
                     if  len(matches)!=0:
                         if suggestions!="":
                             suggestions+=","+str(self.alignSuggestions(matches))
                         else:
                             suggestions+=self.alignSuggestions(matches)
-                    print(suggestions)
+                    #5 faire appele a la methode qui separe le mot de toutes le n-1 façons possible
                     matches = self.permut(subWord)
                     if  len(matches)!=0:
                         if suggestions!="":
@@ -232,16 +255,18 @@ class HashMap:
                             suggestions+=self.alignSuggestions(matches)
 
                     if  suggestions!="":
-                        suggestions="("+str(suggestions)+")"
+                        suggestions="("+str(suggestions)+") "
                         corrected_sentence+=self.concatSentence(subWord,suggestions)
                         suggestions=""
                     else:
-                        corrected_sentence+=subWord
+                        corrected_sentence+=subWord+"()"
                 else:
-                    corrected_sentence+=subWord
+                    corrected_sentence+=subWord+" "
+
+
         return corrected_sentence
 
-
+    #methode qui separe toutes les suggestions possible par une virgule
     def alignSuggestions(self,matches):
         t=""
         co=1
@@ -258,6 +283,33 @@ class HashMap:
         t+="["+str(word)+"]"+str(suggestions)
         return t
 
+    #la methode qui transphorme une non-alpha en une alpha
+    def turn_into_alpha(self,word):
+        newWord=[]
+        if "'" in word:
+            words = word.split("'")
+            newWord.append(words[0])
+            newWord.append(words[1])
+            return newWord
+        if "." in word:
+            word=word.replace(".","")
+        if "," in word:
+            word=word.replace(",","")
+        if "!" in word:
+            word = word.replace("!", "")
+        if "?" in word:
+            word = word.replace("?", "")
+        if ":" in word:
+            word = word.replace(":", "")
+        if ";" in word:
+            word = word.replace(";", "")
+        if "\"" in word:
+            word = word.replace("\"", "")
+
+        newWord.append(word)
+        return newWord
+
+    #methode qui print la table de hachage
     def printTable(self):
         for i in range(len(self._hashTable)):
             print(self.get(i))
@@ -270,6 +322,9 @@ def main():
     #h.printTable()
     #print(h.readInput())
     print(h.correct(h.readInput()))
+
+
+
 
 main()
 
